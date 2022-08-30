@@ -1,37 +1,42 @@
 ﻿using System;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
+using AppMercadin.Helper; 
+using System.IO; 
 
-using AppMercadin.Helper;
-using System.IO;
 
 namespace AppMercadin
 {
-    public partial class App : Application
+    public partial class Main : Application
     {
-        static SQLiteDataBaseHelper database;
 
-        public static SQLiteDataBaseHelper Database
+        static SQLiteDatabaseHelper database;
+
+
+        public static SQLiteDatabaseHelper Database
         {
             get
             {
+
                 if (database == null)
                 {
+
                     string path = Path.Combine(
-                        Environment.GetFolderPath(
-                            Environment.SpecialFolder.LocalApplicationData), "arquivo.db3");
-                    database = new SQLiteDataBaseHelper(path);
+                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "arquivo.db3"
+                    );
+
+                    database = new SQLiteDatabaseHelper(path);
                 }
 
                 return database;
-
             }
         }
-        public App()
+
+        public Main()
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage(new MainPage());
+            MainPage = new NavigationPage(new View.Listagem());
         }
 
         protected override void OnStart()

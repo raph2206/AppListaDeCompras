@@ -1,56 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿using AppMercadin.Model;
 using SQLite;
-using AppMercadin.Model;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AppMercadin.Helper
 {
-    public class SQLiteDataBaseHelper
+
+    public class SQLiteDatabaseHelper
     {
+
         readonly SQLiteAsyncConnection _connection;
-        public SQLiteDataBaseHelper(string path)
+
+        public SQLiteDatabaseHelper(string path)
         {
+   
             _connection = new SQLiteAsyncConnection(path);
-            _connection.CreateTableAsync<Tarefa>().Wait();
+
+            _connection.CreateTableAsync<Produtos>().Wait();
         }
 
-        public Task<int> Save(Tarefa t)
+        public Task<int> Insert(Produtos p)
         {
-            return _connection.InsertAsync(t);
+            return _connection.InsertAsync(p);
         }
 
-        public Task<List<Tarefa>> GetAllRows()
+        public Task<List<Produtos>> Update(Produtos p)
         {
-            return _connection.Table<Tarefa>().ToListAsync();
+            string sql = "UPDATE Produto SET Descricao=?, Quantidade=?, Preco=? WHERE id= ? ";
+            return _connection.QueryAsync<Produtos>(sql, p.Descricao, p.Quantidade, p.Preco, p.Id);
+        }
+
+        public Task<List<Produtos>> GetAll()
+        {
+            return _connection.Table<Produtos>().ToListAsync();
         }
 
         public Task<int> Delete(int id)
         {
-            string sql = "DELETE tarefa SET " +
-                "Descricao=?, Data_criacao=?, Data_conclusao=? " +
-                "WHERE Id=?";
-            return _connection.Table<Tarefa>().DeleteAsync(i => i.Id == id);
+            return _connection.Table<Produtos>().DeleteAsync(i => i.Id == id);
         }
 
-        public Task<List<Tarefa>> Update(Tarefa t)
+        public Task<List<Produtos>> Search(string q)
         {
-            string sql = "UPDATE tarefa SET " +
-                         "Descricao=?, Data_criacao=?, Data_conclusao=? " +
-                         "WHERE Id=?";
+            string sql = "SELECT * FROM Produto WHERE Descricao LIKE '%" + q + "%' ";
 
-            return _connection.QueryAsync<Tarefa>(sql,
-                t.Produto, t.Preco, t.Data_Criacao, t.Data_Conclusao, t.Id);
+            return _connection.QueryAsync<Produtos>(sql);
         }
-
-        public Task<List<Tarefa>> Search(string q)
-        {
-            string sql = "SELECT * FROM tarefa WHERE Descricao LIKE '%" + q + "%'";
-
-            return _connection.QueryAsync<Tarefa>(sql);
-        }
-
     }
 }
